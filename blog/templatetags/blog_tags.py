@@ -1,6 +1,10 @@
+from django.utils.safestring import mark_safe
 from django import template
-from ..models import Post
 from django.db.models import Count
+
+from ..models import Post
+
+import markdown
 
 register = template.Library()
 
@@ -20,3 +24,7 @@ def get_most_commented_posts(count=5):
     # a QuerySet is returned with the annotated published posts and ordered by the total_comments field (or annotation)
     # only the desired number (indicated by 'count' variable) is returned... in this case it's the top commented posts
     return Post.published.annotate(total_comments=Count('comments')).order_by('-total_comments')[:count]
+
+@register.filter(name='markdownz')
+def markdown_format(text):
+    return mark_safe(markdown.markdown(text))
